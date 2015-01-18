@@ -8,7 +8,6 @@
 # 3. "♠︎","♥︎","♣︎","♦︎"
 # 4. print the board
 # 5. let player choose: 1. hit  2. stay
-# 6. 
 
 require 'pry'
 # printout a message to console
@@ -17,13 +16,13 @@ def say(message)
 end
 
 # the data validation method
-def data_validation(options = ['Y', 'N'], choose)
+def data_validation?(options = ['Y', 'N'], choose)
   choose = choose.upcase
   options.include?(choose)
 end
 
 # return if user wanna continue
-def continue_next(choose)
+def continue_next?(choose)
   choose = choose.upcase
   choose == 'Y'
 end
@@ -40,7 +39,7 @@ def init_deck
   return deck
 end
 
-def has_result(points, who)
+def has_result?(points, who)
   if points > 21
     say "Sorry, #{who} scores #{points}, busted."
     return true
@@ -62,34 +61,15 @@ def count_score(deck)
   count_A = 0
 
   deck.each do |card|
-    case card[:rank]
-    when '2'
-      result += 2
-    when '3'
-      result += 3
-    when '4'
-      result += 4
-    when '5'
-      result += 5
-    when '6'
-      result += 6
-    when '7'
-      result += 7
-    when '8'
-      result += 8
-    when '9'
-      result += 9
-    when '10'
-      result += 10
-    when 'J'
-      result += 10
-    when 'Q'
-      result += 10
-    when 'K'
-      result += 10
-    when 'A'
-      has_A = true
-      count_A = count_A + 1
+    if card[:rank].to_i == 0
+      if card[:rank] == 'A'
+        has_A = true
+        count_A = count_A + 1
+      else
+        result += 10
+      end
+    else
+      result += card[:rank].to_i
     end
   end
 
@@ -103,9 +83,7 @@ def count_score(deck)
       end
       count_A -= 1
     end while count_A == 0
-
   end
-
   result
 end
 
@@ -123,8 +101,7 @@ def draw_board(player_name,dealer_deck,player_deck)
     print "  "
   end
   puts
-  say "==============="
-  
+  say "===============" 
 end
 
 # main process
@@ -152,6 +129,12 @@ begin
   begin
     say "Please choose: 1) hit  2) stay"
     decision = gets.chomp.to_i
+    if ![1, 2].include?(decision)
+      puts "Error: you must enter 1 or 2"
+      has_result = false
+      decision = 1
+      next 
+    end
     if decision == 1
       player_deck.push(draw_card_from(decks))
       
@@ -159,7 +142,7 @@ begin
 
       player_score = count_score(player_deck)
     end
-    has_result = has_result(player_score,"you")
+    has_result = has_result?(player_score,"you")
   end while !has_result and decision == 1
 
   # Dealer's turn
@@ -171,7 +154,7 @@ begin
 
       dealer_score = count_score(dealer_deck)
     end while dealer_score < 17
-    has_result = has_result(dealer_score,"dealer")
+    has_result = has_result?(dealer_score,"dealer")
   end
 
   if !has_result
@@ -188,7 +171,7 @@ begin
   begin 
     say "Play again? (Y/N)"
     continue = gets.chomp
-  end while !data_validation(choose = continue)
+  end while !data_validation?(choose = continue)
 
-end while continue_next(continue)
+end while continue_next?(continue)
 say "Bye bye!"
